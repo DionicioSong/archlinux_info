@@ -1,0 +1,47 @@
+! Custom settings
+!URxvt.locale: true
+URxvt.multichar_encoding:utf-8
+URxvt.font:xft:Misc ohsnap:size=10,xft:AR PL UMing TW:style=Book
+URxvt.termName:xterm-256color
+
+! Color settings
+
+URxvt*foreground: #F5D48F
+URxvt*background: #282828
+
+URxvt*color0: Black
+URxvt*color1: firebrick3
+URxvt*color2: #AECE92
+URxvt*color3: DarkGoldenrod3
+URxvt*color4: #414171
+URxvt*color5: #963C59
+URxvt*color6: #418179
+URxvt*color7: #303030
+URxvt*color8: #666666
+URxvt*color9: MediumOrchid3
+URxvt*color10: SeaGreen1
+URxvt*color11: #FFF796
+URxvt*color12: SteelBlue3
+URxvt*color13: #CF9EBE
+URxvt*color14: SlateGray1
+URxvt*color15: #FFFFFF
+
+! Transparent settings
+! URxvt*.shading: 0 to 99 darkens, 101 to 200 lightens
+
+URxvt.depth: 32
+URxvt.background: rgba:0000/0000/0000/bbbb
+!URxvt*.transparent: true
+!URxvt*.shading: 110
+
+! Other settings
+
+URxvt.perl-ext:
+URxvt.perl-ext-common:
+URxvt.scrollBar:False
+!URxvt.letterSpace: 1
+URxvt.savelines:512
+URxvt.mouseWheelScrollPage:true
+!URxvt.meta:ignore
+URxvt*meta8:true
+
