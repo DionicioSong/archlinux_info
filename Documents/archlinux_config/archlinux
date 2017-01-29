@@ -1,0 +1,281 @@
+常用软件: URxvt(终端模拟器), firefox(浏览器), flashplugin, ranger/pcmanfm(文件管理器), xarchiver(文件管理器的解压缩插件), unzip, unrar,
+xdg-user-dirs(生成本地用戶目錄), i3wm(窗口管理器), i3blocks(系统状态栏显示), i3lock(i3wm的锁屏程序), lxappearance/gnome-themes-standard(安装和设置窗口主题和外观),
+atool和unzip-iconv(解压缩工具可以配合ranger使用), dmenu-xft/rofi(输入型快捷软件启动器), feh(壁纸设置软件), compton-git(窗体透明和阴影效果),
+calcurse(控制台界面日程软件), ncdu(磁盘用量分析工具), ntp(时钟网络同步), screenfetch(系统信息查看器), calc或xorg-xcalc(计算器),
+cmus(控制台界面音乐播放器), mpv(小巧简单的万能视频播放器), gvim(文本编辑器), scrot(命令截图工具<配合dmenu或i3的截屏键绑定>), gvfs(回收站), cpupower(cpu降頻調節工具),
+ntfs-3g(提供普通用户读写ntfs分区功能);
+
+显示: xf86-video-intel, libva-intel-driver(硬解);
+
+字体: adobe-source-han-sans-tw-fonts, ttf-arphic-uming, ohsnap, terminus-font
+
+网络: netctl, wpa_supplicant, dialog, dnsmasq;
+
+gtk主題: breeze-icons, paper-gtk-theme;
+
+vi /etc/pacman.d/mirrorlist
+
+第一行添加下面一行
+Server = http://ftp.sjtu.edu.cn/archlinux/$repo/os/$arch
+
+sudo pacman -Sy archlinux-keyring f2fs-tools
+
+mkfs.fat -F32 /dev/sda1
+
+mkfs.f2fs -l archlinux /dev/sda2
+
+mkswap /dev/sda3
+
+swapon /dev/sda3
+
+mount /dev/sda2 /mnt
+
+mkdir -p /mnt/boot
+
+mount /dev/sda1 /mnt/boot
+
+pacstrap /mnt base base-devel
+
+genfstab -p /mnt >> /mnt/etc/fstab
+
+arch-chroot /mnt
+
+echo <主机名称> > /etc/hostname
+
+vi /etc/locale.gen
+去掉zh_TW.UTF-8 UTF-8前面的"#"注释符;
+
+echo LANG=zh_TW.UTF-8 > /etc/locale.conf
+
+export LANG=zh_TW.UTF-8
+
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+locale-gen
+
+useradd -m -g users -G audio,video,floppy,network,scanner,storage,optical,power,wheel,uucp,lp -s /bin/bash <用户名>
+
+passwd
+<输入要设定的密码分别两次>
+
+passwd <用户名>
+<输入要设定的密码分别两次>
+
+EDITOR=vi visudo
+
+# %wheel ALL=(ALL) ALL
+
+去掉前面的"#"
+
+%wheel ALL=(ALL) ALL
+保存
+
+pacman -S grub
+
+grub-install --target=i386-pc --recheck --debug --force /dev/sda
+grub-mkconfig -o /boot/grub/grub.cfg
+
+vi /etc/mkinitcpio.conf
+
+MODULES="" 加入 MODULES="crypto-crc32"
+
+mkinitcpio -p linux
+
+重启！
+
+!------启用并启动系统网路服务
+
+sudo systemctl enable dhcpcd.service
+sudo systemctl start dhcpcd.service
+
+/* 这里的xf86-video-vesa 和 virtualbox-guest-utils 只限于虚拟机内安装,
+ * intel 核芯显卡使用 xf86-video-intel
+ */
+
+sudo pacman -S xorg-server xorg-xinit xorg-utils xorg-server-utils xf86-video-intel
+
+!-----root下的vim配色问题
+
+sudo -E vim xxx
+即可使用非root下的vim配置，gvim同理：
+
+sudo -E gvim xxx
+
+!-----yaourt安装(yaourt命令不用加sudo, 否则会出错的)
+
+sudo pacman -Syu
+
+sudo vi /etc/pacman.conf
+底部内容加上
+[archlinuxcn]
+#The Chinese Arch Linux communities packages.
+SigLevel = Optional TrustAll
+Server = http://repo.archlinuxcn.org/$arch
+
+sudo pacman -Sy yaourt
+
+或者用第二种安装方法------
+
+sudo pacman -S wget
+
+wget https://aur.archlinux.org/packages/pa/package-query/package-query.tar.gz
+tar zxvf package-query.tar.gz
+cd package-query
+makepkg -si
+cd ..
+
+wget https://aur.archlinux.org/packages/ya/yaourt/yaourt.tar.gz
+tar zxvf yaourt.tar.gz
+cd yaourt
+makepkg -si
+cd ..
+
+sudo pacman -S firefox flashplugin rxvt-unicode i3 rofi vim terminus-font
+ttf-arphic-uming feh ranger pcmanfm alsa-utils scrot gvfs ncdu i3blocks
+i3lock git mpv xarchiver unzip unrar calcurse ntp xdg-user-dirs ntfs-3g
+cpupower lxappearance gnome-themes-standard breeze-icons paper-gtk-theme
+fcitx-googlepinyin fcitx-configtool
+
+!------fcitx的安装和配置
+
+sudo pacman -S fcitx-googlepinyin fcitx-configtool
+
+在.xinitrc里面加入:
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS="@im=fcitx"
+
+!------i3安装与配置
+
+sudo pacman -S i3 vim
+
+sudo cp /etc/X11/xinit/xinitrc .xinitrc
+
+sudo vim .xinitrc
+
+添加下面一行
+exec i3
+
+sudo vim .bash_profile
+
+原来里面的内容改成下面一行
+[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && exec startx
+
+vim .i3/config	    ---编辑i3配置文件
+
+
+!------视频画面撕裂问题的解决
+
+sudo touch /etc/X11/xorg.conf.d/20-intel.conf
+
+sudo vim /etc/X11/xorg.conf.d/20-intel.conf
+
+添加以下内容:
+Section "Device"
+   Identifier	"Intel Graphics"
+   Driver	"intel"
+   Option	"TearFree" "true"
+EndSection
+
+!------URxvt的配置
+
+下载已经配置好的配置文件(.Xresources)放在 /home/<用户名>/ 下面
+
+xrdb -load .Xresources
+
+!------桌面壁纸设置
+
+sudo pacman -S feh
+sudo vim .xinitrc
+加入	feh --bg-scale '/home/<用户名>/Pictures/Wallpapers/wallpaper.png'
+
+!------改变dmenu出现位置
+
+在~/i3/config文件里的
+exec dmenu_run 变为 exec --no-startup-id dmenu_run -b -fn ohsnap -nb '#222222' -nf '#f3cd7d' -sb '#7bbfea' -sf '#222222'
+
+用dmenu键入: fcitx-config-gtk3打开fcitx配置框, 加入googlepinyin后退出, 最好不要变动输入法的顺序.
+
+
+!------禁用触摸板
+
+xinput list 列出输入设备列表，找到touchpad那一行的设备名；
+xinput list-props '<设备名>'	查看Device Enabled的值， 一般为1为启用， 0为禁用；
+xinput set-prop '<设备名>' 'Device Enabled' 0	来禁用它；
+或者将命令写进脚本里开机启动禁用它；
+
+!------wifi设置
+
+ip link	查看网络设备名称
+sudo pacman -S netctl dialog wpa_supplicant
+sudo wifi-menu -o
+    <选择需要连接的wifi网络路由, 输入密令>
+ip link set <无线网卡设备名称> down
+sudo netctl start <你连接的wifi路由名称SSID>
+sudo netctl enable <你连接的wifi路由名称SSID>
+
+!------mpd配置
+
+sudo pacman -S mpd
+sudo vim /etc/mpd.conf
+<edit mpd.conf>
+music_directory "~/Music"
+<end>
+
+mkdir ~/.config/mpd
+sudo cp /usr/share/doc/mpd/mpdconf.example ~/.config/mpd/mpd.conf
+
+sudo vim ~/.config/mpd/mpd.conf
+<edit mpd.conf add follows>
+# Required files
+db_file            "~/.config/mpd/database"
+log_file           "~/.config/mpd/log"
+
+# Optional
+music_directory    "~/Music"
+playlist_directory "~/.config/mpd/playlists"
+pid_file           "~/.config/mpd/pid"
+state_file         "~/.config/mpd/state"
+sticker_file       "~/.config/mpd/sticker.sql"
+<end>
+
+mkdir ~/.config/mpd/playlists
+touch ~/.config/mpd/{database,log,pid,state,sticker.sql}
+mpd ~/.config/mpd/mpd.conf
+mpd
+
+!------ncmpcpp配置
+
+sudo pacman -S ncmpcpp
+mkdir ~/.ncmpcpp/config
+sudo cp /usr/share/doc/ncmpcpp/config ~/.ncmpcpp/config
+
+!------钥匙圈错误的解决
+
+sudo pacman -S archlinux-keyring
+
+!------常用的pacman命令
+
+sudo pacman -S <abc>	!---安装
+sudo pacman -Rsn <abc>	!---卸载
+sudo pacman -Scc    !---清缓存
+sudo pacman -Syu    !---同步更新
+sudo pacman -Qdt    !---列出所有不被依賴的孤立包
+sudo pacman -Sw	<abc>    !---只下载不安装软件包
+sudo pacman -Syy    !---强制更新软件包列表
+sudo pacman -Qi <abc>	!---查询本地安装包的详细信息
+pacman -Si <abc>    !---显示软件包详细信息
+
+!------自动关闭屏幕设置
+
+xset s 0    关闭screensave模式；
+xset dpms 3600 4200 5400    设置为1小时（3600秒）黑屏，1小时10分钟（4200秒）睡眠，1.5小时（5400秒）关机；
+
+!------查看窗口的WM_CLASS名称
+
+终端执行 xprop 命令;
+然后点击要查看的窗口, 信息显示在终端上, 例如: WM_CLASS(STRING) = "URxvt", "URxvt"
+
+!------i3wm的补丁
+
+i3-gaps 是i3wm的窗口间隔补丁, 提供窗口间隔支持, 网址: https://github.com/Airblader/i3;
