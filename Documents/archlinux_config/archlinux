@@ -77,7 +77,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 vi /etc/mkinitcpio.conf
 
-MODULES="" 加入 MODULES="crypto-crc32"
+MODULES="" 变成 MODULES="crypto-crc32"
 
 mkinitcpio -p linux
 
